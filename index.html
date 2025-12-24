@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Todo Matrix — Responsive</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app" id="app">
+    <header class="app-header">
+      <h1 class="app-title">Todo Matrix</h1>
+      <p class="subtitle">Four quadrants from "The 7 Habits" — place tasks by urgency &amp; importance.</p>
+    </header>
+
+    <form id="todo-form" class="todo-form" aria-label="Add todo">
+      <input id="todo-input" type="text" placeholder="New task..." aria-label="New task" autocomplete="off" />
+      <select id="quadrant-select" aria-label="Select quadrant">
+        <option value="I">I — Urgent & Important</option>
+        <option value="II">II — Not Urgent & Important</option>
+        <option value="III">III — Urgent & Not Important</option>
+        <option value="IV">IV — Not Urgent & Not Important</option>
+      </select>
+
+      <!-- New: separate date and time inputs -->
+      <input id="todo-date" type="date" aria-label="Due date" />
+      <input id="todo-time" type="time" aria-label="Due time" />
+
+      <button type="submit" id="add-btn" aria-label="Add task">Add</button>
+    </form>
+
+    <section class="matrix" role="list" aria-label="Time management matrix">
+      <section class="quadrant q-i" data-q="I" aria-label="Quadrant I">
+        <header>
+          <div class="h-left">
+            <h2>I</h2>
+            <div class="q-title">Urgent &amp; Important</div>
+          </div>
+          <div class="q-count" data-count-for="I" aria-live="polite">0</div>
+        </header>
+        <ul class="q-list" id="list-I" tabindex="0" aria-label="Quadrant I tasks"></ul>
+      </section>
+
+      <section class="quadrant q-ii" data-q="II" aria-label="Quadrant II">
+        <header>
+          <div class="h-left">
+            <h2>II</h2>
+            <div class="q-title">Not Urgent &amp; Important</div>
+          </div>
+          <div class="q-count" data-count-for="II" aria-live="polite">0</div>
+        </header>
+        <ul class="q-list" id="list-II" tabindex="0" aria-label="Quadrant II tasks"></ul>
+      </section>
+
+      <section class="quadrant q-iii" data-q="III" aria-label="Quadrant III">
+        <header>
+          <div class="h-left">
+            <h2>III</h2>
+            <div class="q-title">Urgent &amp; Not Important</div>
+          </div>
+          <div class="q-count" data-count-for="III" aria-live="polite">0</div>
+        </header>
+        <ul class="q-list" id="list-III" tabindex="0" aria-label="Quadrant III tasks"></ul>
+      </section>
+
+      <section class="quadrant q-iv" data-q="IV" aria-label="Quadrant IV">
+        <header>
+          <div class="h-left">
+            <h2>IV</h2>
+            <div class="q-title">Not Urgent &amp; Not Important</div>
+          </div>
+          <div class="q-count" data-count-for="IV" aria-live="polite">0</div>
+        </header>
+        <ul class="q-list" id="list-IV" tabindex="0" aria-label="Quadrant IV tasks"></ul>
+      </section>
+    </section>
+
+    <div class="bottom-controls">
+      <div id="stats" class="stats" aria-live="polite">0 tasks total</div>
+      <div class="legend">Tip: Tap Edit/Delete to open the full form. Double-tap a task for inline edit.</div>
+    </div>
+  </main>
+
+  <!-- Modal: Edit / Delete (now includes date & time) -->
+  <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-overlay" data-close="true" tabindex="-1"></div>
+
+    <div class="modal-dialog" role="document">
+      <form id="modal-form" class="modal-form">
+        <h3 id="modal-title">Edit Task</h3>
+
+        <label class="modal-label">Task
+          <input id="modal-text" name="text" type="text" required autocomplete="off" />
+        </label>
+
+        <div class="modal-row">
+          <label class="modal-label">Due date
+            <input id="modal-date" name="date" type="date" />
+          </label>
+
+          <label class="modal-label">Due time
+            <input id="modal-time" name="time" type="time" />
+          </label>
+        </div>
+
+        <label class="modal-label">Quadrant
+          <select id="modal-quadrant" name="quadrant">
+            <option value="I">I — Urgent & Important</option>
+            <option value="II">II — Not Urgent & Important</option>
+            <option value="III">III — Urgent & Not Important</option>
+            <option value="IV">IV — Not Urgent & Not Important</option>
+          </select>
+        </label>
+
+        <label class="modal-checkbox"><input id="modal-completed" name="completed" type="checkbox" /> Completed</label>
+
+        <div class="modal-actions">
+          <button type="submit" id="modal-update" class="btn btn-primary">Update</button>
+          <button type="button" id="modal-delete" class="btn btn-danger">Delete</button>
+          <button type="button" id="modal-cancel" class="btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
