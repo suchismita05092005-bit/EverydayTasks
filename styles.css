@@ -1,0 +1,1078 @@
+:root{
+  --bg: #f7fafc;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --radius: 12px;
+  --shadow: 0 8px 30px rgba(2,6,23,0.08);
+
+  /* quadrant colors */
+  --q-i: 217 83 79;
+  --q-ii: 43 187 173;
+  --q-iii: 240 173 78;
+  --q-iv: 108 122 137;
+
+  /* status RGB triplets */
+  --status-warning: 250 204 21;   /* yellow (active upcoming / normal) */
+  --status-overdue: 239 68 68;    /* red */
+  --status-done: 34 197 94;       /* green (completed on time) */
+  --status-done-late: 249 115 22; /* orange (completed late) */
+
+  --base-font: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--base-font);
+  color-scheme: light;
+}
+
+/* base layout */
+*{box-sizing:border-box}
+html{font-size:clamp(14px,1.6vw,16px)}
+body{margin:0;background:linear-gradient(180deg,#eef2ff 0%,var(--bg) 100%);-webkit-font-smoothing:antialiased}
+.app{width:100%;max-width:1100px;margin:24px auto;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:clamp(12px,2vw,22px)}
+.app-header{margin-bottom:8px}
+.app-title{margin:0 0 6px;font-size:clamp(1.1rem,2.4vw,1.4rem)}
+.subtitle{margin:0 0 14px;color:var(--muted);font-size:0.95rem}
+
+/* form */
+.todo-form{
+  display:flex;
+  gap:10px;
+  margin-bottom:18px;
+  align-items:center;
+  flex-wrap:wrap;
+  background:white;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,0.05);
+  box-shadow:0 4px 20px rgba(0,0,0,0.04);
+}
+#todo-input,
+#quadrant-select,
+#todo-date,
+#todo-time{
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #e6eef8;
+  background:white;
+  min-height:44px;
+  font-size:1rem;
+}
+#todo-date,#todo-time{width:150px}
+#add-btn{
+  background:linear-gradient(180deg,#2563eb,#1e4bb5);
+  color:white;
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  min-height:44px;
+  font-weight:600;
+  transition:0.15s ease;
+}
+#add-btn:hover{transform:translateY(-2px)}
+
+/* matrix */
+.matrix{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));grid-auto-rows:minmax(140px,auto);gap:14px;min-height:420px}
+.quadrant{
+  background:white;
+  border-radius:10px;
+  padding:14px;
+  border:1px solid rgba(0,0,0,0.06);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 4px 16px rgba(0,0,0,0.03);
+}
+.q-i{--accent-rgb:var(--q-i)}
+.q-ii{--accent-rgb:var(--q-ii)}
+.q-iii{--accent-rgb:var(--q-iii)}
+.q-iv{--accent-rgb:var(--q-iv)}
+.quadrant::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:14px;
+  background:linear-gradient(180deg,rgba(var(--accent-rgb),0.28),rgba(var(--accent-rgb),0.12));
+  border-radius:10px 0 0 10px;
+}
+
+/* quadrant header */
+.quadrant header{display:flex;align-items:center;gap:12px}
+.h-left{display:flex;align-items:center;gap:10px}
+.quadrant h2{
+  margin:0;
+  width:44px;
+  height:44px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(var(--accent-rgb),0.10);
+  font-weight:700;
+}
+.q-title{font-size:0.98rem;color:var(--muted)}
+.q-count{margin-left:auto;color:var(--muted);font-weight:700}
+
+/* list */
+/* 🛠 FIX: Make cards shrink properly in quadrant */
+.q-list {
+  overflow-y: auto;
+  /* overflow-x: hidden; */
+  width: 100%;
+}
+
+
+/* ===========================================
+   📌 FINAL CARD LAYOUT (Desktop + Mobile)
+=========================================== */
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 14px 14px 28px;
+  border-radius: 14px;
+  border: 2px solid rgba(0,0,0,0.06);
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+/* Left color strip ALWAYS visible */
+.todo-item::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 10px;
+  bottom: 10px;
+  width: 10px;
+  border-radius: 6px;
+  background: rgb(var(--status-warning)); /* default */
+}
+
+/* ✨ Make mobile perfectly stacked */
+@media (max-width: 768px) {
+  .todo-item {
+    flex-direction: column;
+    padding: 16px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+
+  .todo-item > * {
+    width: 100%;
+  }
+
+  .card-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .item-actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .quad {
+    width: 100%;
+  }
+}
+
+
+/* 🛠 FIX: prevent inner elements from forcing overflow */
+.todo-item > * {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+/* 🛠 FIX: text container grows but never pushes out */
+.card-info, .todo-text {
+  min-width: 120px;
+  flex: 1;
+  word-break: break-word;
+}
+
+/* 🛠 FIX: action buttons stay right, wrap under when needed */
+.item-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+/* 🛠 Quadrant dropdown won't stretch card width */
+.quad {
+  flex: 0 0 auto;
+  max-width: 70px;
+}
+
+/* 🛠 Buttons fixed size; no stretching */
+.icon-btn {
+  flex: 0 0 40px;
+}
+
+/* 🛠 FIX quadrant grid overflow issue */
+.matrix {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* =========================================
+   📱 MOBILE — KEEP DESKTOP-LIKE CARD LAYOUT
+========================================= */
+@media (max-width: 768px) {
+
+  .todo-item {
+    flex-direction: row;           /* 🔥 keep horizontal */
+    align-items: center;
+    gap: 10px;
+    padding: 12px 12px 12px 26px;  /* tighter padding */
+  }
+
+  /* Left color bar stays perfect */
+  .todo-item::before {
+    left: 6px;
+    top: 8px;
+    bottom: 8px;
+    width: 8px;
+  }
+
+  /* Checkbox slightly smaller */
+  .check {
+    width: 38px;
+    height: 38px;
+  }
+
+  /* Task text compact but readable */
+  .task-name {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .task-due {
+    font-size: 12px;
+  }
+
+  /* Keep actions inline */
+  .item-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+  }
+
+  /* Dropdown compact */
+  .quad {
+    max-width: 64px;
+    height: 36px;
+  }
+
+  /* Action buttons compact */
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+}
+
+/* =========================================================
+   🔒 FINAL MOBILE OVERRIDE — CARD-INNER (REAL CARD)
+========================================================= */
+@media (max-width: 768px) {
+
+  .card-inner {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 12px 12px 12px 12px !important;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure left color strip ALWAYS visible */
+  .card-bar {
+    flex: 0 0 6px !important;
+    height: auto !important;
+    align-self: stretch !important;
+    border-radius: 6px;
+  }
+
+  /* Prevent content shrink */
+  .card-inner > * {
+    flex-shrink: 0 !important;
+  }
+
+  /* Text stays readable */
+  .card-info {
+    min-width: 180px;
+  }
+
+  /* Actions always reachable */
+  .item-actions {
+    margin-left: auto !important;
+    display: flex !important;
+    gap: 6px;
+  }
+
+  /* Scrollbar hint */
+  .card-inner::-webkit-scrollbar {
+    height: 4px;
+  }
+  .card-inner::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.35);
+    border-radius: 4px;
+  }
+}
+
+/* todo item (card) */
+.todo-item:hover{box-shadow:0 6px 22px rgba(0,0,0,0.08);transform:translateY(-2px)}
+
+.todo-item.status-warning::before { background: rgb(var(--status-warning)) }
+.todo-item.status-overdue::before { background: rgb(var(--status-overdue)) }
+.todo-item.status-done::before { background: rgb(var(--status-done)) }
+.todo-item.status-done-late::before { background: rgb(var(--status-done-late)) }
+
+.todo-item::before{
+  content:"";
+  position:absolute;
+  left:6px;
+  top:10px;
+  bottom:10px;
+  width:10px;
+  border-radius:6px;
+}
+
+/* ======================
+   CARD CONTAINER STYLING
+====================== */
+.todo-card {
+  display: block;
+  margin: 10px 0;
+  background: #FFFFFF;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* ======================
+   INSIDE CARD LAYOUT
+====================== */
+.card-inner {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 16px;
+}
+
+/* LEFT COLOR STRIP */
+.card-bar {
+  width: 6px;
+  border-radius: 10px;
+  height: 70px;
+  background: var(--bar-color);
+}
+
+/* BIG CHECKBOX */
+.check {
+  width: 42px;
+  height: 42px;
+  border-radius: 6px; /* rectangle with slightly rounded corners */
+  border: 3px solid #4caf50; /* green border always */
+  background: white;
+  font-size: 24px;
+  font-weight: bold;
+  color: #4caf50; /* green tick when checked */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+/* When checked (✔️ present) */
+.check.checked {
+  background: white;        /* keep white, no fill */
+  border-color: #4caf50;    /* green border */
+  color: #4caf50;           /* green tick */
+}
+
+/* Hover/Active Feedback */
+.check:hover {
+  transform: scale(1.05);
+}
+.check:active {
+  transform: scale(0.95);
+}
+
+/* TASK TEXT + DUE DATE */
+.card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.task-name {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.3;
+  max-height: 40px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-due {
+  font-size: 13px;
+  opacity: .7;
+  margin-top: 2px;
+}
+
+/* SELECT - QUADRANT */
+.quad {
+  height: 40px;
+  padding: 5px 8px;
+  border-radius: 10px;
+}
+
+/* ACTION ICON BUTTONS */
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  background:#f5f5f5;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+.icon-btn.edit { color:#0B5394; }
+.icon-btn.del  { color:#B03030; }
+.icon-btn:hover { background:#e8e8e8; }
+
+/* MOBILE */
+@media(max-width:600px){
+  .card-inner {
+    gap: 8px;
+    padding: 10px;
+  }
+  .check { width:42px; height:42px; }
+  .task-name { font-size:15px; }
+  .task-due { font-size:12px; }
+}
+
+
+/* -------------------------------------------------
+   CARD ACTION BUTTONS (edit + delete)
+--------------------------------------------------*/
+.item-actions{
+  display:flex;
+  gap:8px;
+  margin-left:auto;
+}
+
+.btn-icon{
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  font-size:1.1rem;
+  background:#f1f5f9;
+  color:#475569;
+  transition:all .20s ease;
+}
+
+.btn-icon:hover{
+  background:#e2e8f0;
+  transform:translateY(-2px);
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* Edit - Blue theme */
+.edit-btn:hover{
+  background:rgba(37,99,235,0.15);
+  color:#1e40af;
+}
+
+/* Delete - Red theme */
+.delete-btn:hover{
+  background:rgba(220,38,38,0.15);
+  color:#b91c1c;
+}
+
+/* CHECKBOX + TEXT */
+.checkbox{
+  width:44px;
+  height:44px;
+  min-width:44px;
+  border-radius:10px;
+  border:2px solid #cbd5e1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  background:white;
+  font-weight:700;
+  font-size:1.2rem;
+}
+
+/* Improve text readability */
+.todo-text{
+  font-size:1.05rem;
+  font-weight:500;
+}
+
+.todo-text .meta{
+  margin-top:2px;
+  font-size:0.78rem;
+  opacity:0.85;
+}
+
+/* CARD ACTION BUTTONS */
+.item-actions{
+  display:flex;
+  gap:8px;
+  margin:8px 0 10px auto;
+  justify-content:flex-end;
+}
+.btn-icon{
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  font-size:1.1rem;
+  background:#f1f5f9;
+  color:#475569;
+  transition:all .20s ease;
+}
+.btn-icon:hover{
+  background:#e2e8f0;
+  transform:translateY(-2px);
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+
+.edit-btn:hover{
+  background:rgba(37,99,235,0.15);
+  color:#1e40af;
+}
+.delete-btn:hover{
+  background:rgba(220,38,38,0.15);
+  color:#b91c1c;
+}
+
+/* STATUS DOT */
+.status-dot{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  flex:0 0 12px;
+  border:2px solid rgba(255,255,255,0.6);
+}
+
+/* ==========================================
+   ADD TASK FORM — PROFESSIONAL UI
+========================================== */
+.todo-form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  border: 1px solid #e8e8e8;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.todo-form input,
+.todo-form select {
+  flex: 1;
+  min-width: 150px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1.5px solid #e1e4ed;
+  background: #fafafa;
+  font-size: 15px;
+  transition: 0.25s;
+  font-weight: 500;
+}
+
+.todo-form input:focus,
+.todo-form select:focus {
+  border-color: #1d7eff;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(29,126,255,0.18);
+  outline: none;
+}
+
+.todo-form button {
+  background: #007bff;
+  color: #fff;
+  padding: 14px 26px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.25s;
+  white-space: nowrap;
+}
+
+.todo-form button:hover {
+  background: #005fcc;
+  transform: translateY(-1px);
+}
+
+.todo-form input[type="date"],
+.todo-form input[type="time"] {
+  text-align: left;
+}
+
+/* 📱 Mobile Responsive */
+@media (max-width: 768px) {
+  .todo-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .todo-form input,
+  .todo-form select,
+  .todo-form button {
+    width: 100%;
+  }
+
+  .todo-form button {
+    margin-top: 8px;
+  }
+}
+
+/* 🖼️ Icon Styling */
+.todo-form .with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-icon {
+  width: 18px;
+  opacity: 0.7;
+}
+
+/* STATUS COLORS — FULL CARD THEME */
+.todo-item.status-warning{
+  border-color:rgba(var(--status-warning),0.55);
+  background:rgba(var(--status-warning),0.10);
+}
+.todo-item.status-warning::before{background:rgb(var(--status-warning))}
+
+.todo-item.status-overdue{
+  border-color:rgba(var(--status-overdue),0.65);
+  background:rgba(var(--status-overdue),0.10);
+}
+.todo-item.status-overdue::before{background:rgb(var(--status-overdue))}
+
+.todo-item.status-done{
+  border-color:rgba(var(--status-done),0.60);
+  background:rgba(var(--status-done),0.10);
+}
+.todo-item.status-done::before{background:rgb(var(--status-done))}
+
+.todo-item.status-done-late{
+  border-color:rgba(var(--status-done-late),0.60);
+  background:rgba(var(--status-done-late),0.10);
+}
+.todo-item.status-done-late::before{background:rgb(var(--status-done-late))}
+
+/* COMPLETED TEXT */
+.todo-text.completed{
+  text-decoration:line-through;
+  color:rgb(var(--status-done));
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal[open] {
+  display: flex;
+}
+
+/* ---------- Modal Professional Layout ---------- */
+
+/* Cancel button top-right corner (square) */
+#modal-cancel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgb(var(--status-overdue));
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: 0.2s ease;
+}
+#modal-cancel:hover {
+  background: rgb(220,40,40);
+  transform: translateY(-2px);
+}
+
+/* Modal form layout groups */
+.modal-form label {
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--muted);
+}
+
+/* Flex rows for better layout */
+.modal-form .row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+/* Task name row */
+/* Always stack Task label above input */
+.modal-form .task-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* space between label and input */
+  margin-bottom: 12px;
+}
+
+.modal-form .task-row label {
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.modal-form .task-row input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+/* Quadrant + Completed row */
+.modal-form .row.quadrant-row {
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Due date + time row */
+.modal-form .row.due-row {
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+/* Inputs styling inside modal */
+.modal-form input[type="text"],
+.modal-form select,
+.modal-form input[type="date"],
+.modal-form input[type="time"] {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e6eef8;
+  font-size: 1rem;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+  transition: 0.15s ease;
+}
+.modal-form input[type="text"]:focus,
+.modal-form select:focus,
+.modal-form input[type="date"]:focus,
+.modal-form input[type="time"]:focus {
+  outline: 2px solid rgba(37,99,235,0.4);
+  outline-offset: 2px;
+}
+
+/* Checkbox inline styling */
+#modal-completed {
+  margin-left: 6px;
+  transform: scale(1.2);
+}
+
+/* Modal actions styling */
+.modal-actions {
+  justify-content: flex-end;
+  margin-top: 12px;
+  gap: 10px;
+}
+
+/* Professional shadow & spacing */
+.modal-dialog {
+  border-radius: 12px;
+  padding: 20px;
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+
+/* -------- Modal Button Refinement -------- */
+.modal-actions .btn {
+  border: none; /* remove border */
+}
+
+/* Space between labels and input fields */
+.modal-form .row > div, 
+.modal-form .row > label + input,
+.modal-form .row > label + select {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* space between label and value */
+}
+
+/* Completed checkbox inline for all devices */
+.modal-form .completed-row {
+  display: flex !important;       /* force flex */
+  flex-direction: row !important; /* always row */
+  align-items: center;            /* vertical alignment */
+  gap: 8px;                       /* space between label and checkbox */
+  justify-content: flex-start;    /* left-align checkbox on mobile */
+}
+
+.modal-form .completed-row label {
+  margin: 0;
+  font-weight: 500;
+  white-space: nowrap;            /* prevent wrapping */
+}
+
+.modal-form .completed-row input[type="checkbox"] {
+  margin: 0;
+  flex: 0 0 auto;                 /* avoid stretching */
+  transform: scale(1.1);          /* optional: slightly bigger checkbox */
+}
+
+
+/* ---------- Responsive Mobile Layout ---------- */
+/* Align Completed checkbox left on mobile */
+@media (max-width:600px) {
+  .modal-form .row.quadrant-row {
+    flex-direction: column;
+    align-items: flex-start; /* checkbox starts from left */
+  }
+}
+@media (max-width:600px){
+  .modal-form .row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .modal-form input[type="text"],
+  .modal-form select,
+  .modal-form input[type="date"],
+  .modal-form input[type="time"] {
+    width: 100%;
+  }
+  #modal-cancel {
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+}
+
+/* responsive */
+@media (max-width:900px){.matrix{grid-template-columns:repeat(2,minmax(240px,1fr));gap:12px}}
+@media (max-width:700px){
+  .matrix{grid-template-columns:1fr}
+  .todo-form{
+    position:sticky;top:8px;background:white;
+    padding:12px;border-radius:12px;z-index:60;
+    box-shadow:0 8px 24px rgba(0,0,0,0.06);
+  }
+  #todo-input,#quadrant-select,#add-btn,#todo-date,#todo-time{width:100%}
+  .q-list{max-height:45vh}
+}
+
+/* modal */
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:9999}
+.modal[aria-hidden="false"]{display:flex}
+.modal-overlay{position:absolute;inset:0;background:rgba(2,6,23,0.45);backdrop-filter:blur(2px)}
+.modal-dialog{position:relative;max-width:560px;width:94%;margin:20px;z-index:2}
+.modal-form{
+  background:white;border-radius:12px;padding:18px;
+  display:flex;flex-direction:column;gap:14px;
+  box-shadow:0 12px 40px rgba(2,6,23,0.18);
+  border:1px solid rgba(0,0,0,0.06);
+}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+.btn{padding:10px 12px;border-radius:8px;cursor:pointer;min-height:44px}
+.btn-primary{background:linear-gradient(180deg,#2563eb,#1e4bb5);color:white}
+.btn-danger{background:rgb(var(--status-overdue));color:white}
+
+:focus{outline:3px solid rgba(37,99,235,0.3);outline-offset:2px;border-radius:6px}
+
+/* ================= Delete Modal ================= */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100vh;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(3px);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.delete-modal {
+  background: #fff;
+  width: 90%;
+  max-width: 450px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.delete-header {
+  background: #d7373f;
+  padding: 14px 18px;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.delete-body {
+  padding: 18px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.delete-body strong {
+  font-weight: 700;
+  color: #222;
+}
+
+.delete-footer {
+  padding: 14px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  border-top: 1px solid #eee;
+}
+
+.cancel-btn {
+  background: #555;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.confirm-delete-btn {
+  background: #d7373f;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover { opacity: .8; }
+.confirm-delete-btn:hover { opacity: .8; }
+
+/* Theme Toggle Button */
+.theme-btn {
+  margin-left: auto;
+  cursor: pointer;
+  font-size: 22px;
+  background: none;
+  border: none;
+  padding: 6px;
+  transition: .2s;
+}
+.theme-btn:hover {
+  transform: scale(1.1);
+}
+
+/* 🌙 DARK THEME */
+body.dark {
+  background: #111;
+  color: #f8f8f8;
+}
+body.dark .todo-card {
+  background: #1d1d1d;
+  color: #fff;
+}
+body.dark input, body.dark select {
+  background: #222;
+  color: #fff;
+  border-color: #444;
+}
+body.dark .icon-btn {
+  background: #333;
+}
+body.dark .theme-btn { color: #fff; }
+
+#mic-btn {
+  background: #fff;
+  border: 2px solid #007bff;
+  color: #007bff;
+  font-size: 20px;
+}
+#mic-btn.listening {
+  background: #007bff;
+  color: #fff;
+  animation: pulse 1s infinite alternate;
+}
+@keyframes pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); }
+}

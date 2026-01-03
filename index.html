@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Todo Matrix — 4 Quadrants</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+  <main class="app" id="app">
+
+    <header class="app-header">
+      <h1 class="app-title">Todo Matrix - The 7 Habits of Highly Effective People</h1>
+      <!-- <button id="theme-toggle" class="theme-btn" title="Toggle theme">🌙</button> -->
+      <p class="subtitle">Four quadrants — prioritize by urgency & importance (IST timezone, 24h).</p>
+    </header>
+    
+    <!-- 📝 ADD TASK FORM -->
+    <form id="todo-form" class="todo-form">
+    
+          <div class="with-icon">
+            <img src="https://img.icons8.com/fluency-systems-regular/24/pen.png" class="input-icon">
+            <input id="todo-input" type="text" placeholder="New task..." required>
+          </div>
+
+          <select id="quadrant-select">
+            <option value="I">I — Urgent & Important</option>
+            <option value="II">II — Not Urgent & Important</option>
+            <option value="III">III — Urgent & Not Important</option>
+            <option value="IV">IV — Not Urgent & Not Important</option>
+          </select>
+
+          <div class="with-icon">
+            <img src="https://img.icons8.com/fluency-systems-regular/24/calendar.png" class="input-icon">
+            <input id="todo-date" type="date">
+          </div>
+
+          <div class="with-icon">
+            <img src="https://img.icons8.com/fluency-systems-regular/24/time.png" class="input-icon">
+            <input id="todo-time" type="time">
+          </div>
+
+          <button type="submit">Add</button>
+          <button type="button" id="mic-btn" class="icon-btn"><i class="bi bi-mic-fill"></i></button>
+      </form>
+
+    <!-- 📌 QUADRANTS -->
+    <section class="matrix" role="list" aria-label="Time management matrix">
+
+      <section class="quadrant q-i" data-q="I">
+        <header>
+          <div class="h-left">
+            <h2>I</h2><div class="q-title">Urgent & Important</div>
+          </div>
+          <div class="q-count" data-count-for="I">0</div>
+        </header>
+        <ul class="q-list" id="list-I"></ul>
+      </section>
+
+      <section class="quadrant q-ii" data-q="II">
+        <header>
+          <div class="h-left">
+            <h2>II</h2><div class="q-title">Not Urgent & Important</div>
+          </div>
+          <div class="q-count" data-count-for="II">0</div>
+        </header>
+        <ul class="q-list" id="list-II"></ul>
+      </section>
+
+      <section class="quadrant q-iii" data-q="III">
+        <header>
+          <div class="h-left">
+            <h2>III</h2><div class="q-title">Urgent & Not Important</div>
+          </div>
+          <div class="q-count" data-count-for="III">0</div>
+        </header>
+        <ul class="q-list" id="list-III"></ul>
+      </section>
+
+      <section class="quadrant q-iv" data-q="IV">
+        <header>
+          <div class="h-left">
+            <h2>IV</h2><div class="q-title">Not Urgent & Not Important</div>
+          </div>
+          <div class="q-count" data-count-for="IV">0</div>
+        </header>
+        <ul class="q-list" id="list-IV"></ul>
+      </section>
+
+    </section>
+
+    <div class="bottom-controls">
+      <div id="stats" class="stats">0 Tasks</div>
+      <div class="legend">
+        💡 Colors auto-update by status → 
+        <strong>Pending:</strong> Yellow | 
+        <strong>Overdue:</strong> Red | 
+        <strong>Done:</strong> Green |
+        <strong>Done Late:</strong> Blue
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 🛠️ EDIT MODAL -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-overlay" data-close="true"></div>
+    <div class="modal-dialog">
+      <form id="modal-form" class="modal-form">
+        
+        <div class="task-row">
+          <label for="modal-text">Task Name</label>
+          <input type="text" id="modal-text" required>
+        </div>
+
+        <div class="row quadrant-row">
+          <div>
+            <label>Quadrant</label>
+            <select id="modal-quadrant">
+              <option value="I">I — Urgent & Important</option>
+              <option value="II">II — Not Urgent & Important</option>
+              <option value="III">III — Urgent & Not Important</option>
+              <option value="IV">IV — Not Urgent & Not Important</option>
+            </select>
+          </div>
+          <div class="completed-row">
+            <label for="modal-completed">Completed</label>
+            <input type="checkbox" id="modal-completed">
+          </div>
+        </div>
+
+        <div class="row due-row">
+          <div>
+            <label for="modal-date">Due Date</label>
+            <input type="date" id="modal-date">
+          </div>
+          <div>
+            <label for="modal-time">Due Time</label>
+            <input type="time" id="modal-time">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" id="modal-delete" class="btn btn-danger">Delete</button>
+        </div>
+
+        <button type="button" id="modal-cancel">×</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= Delete Confirmation Modal ================= -->
+  <div id="deleteModal" class="modal-overlay">
+    <div class="delete-modal">
+      <div class="delete-header">
+        <span>⚠️ Confirm Deletion</span>
+        <button class="close-modal">&times;</button>
+      </div>
+
+      <div class="delete-body">
+        <p>Are you sure you want to delete the task <strong id="delTaskName"></strong>?</p>
+        <p id="delTaskDue"></p>
+      </div>
+
+      <div class="delete-footer">
+        <button class="cancel-btn">Cancel</button>
+        <button class="confirm-delete-btn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include your script.js -->
+  <script src="script.js"></script>
+</body>
+</html>
